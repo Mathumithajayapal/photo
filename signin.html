@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sign In · LensPro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT VARIABLES ===== */
+    :root {
+      --brand-primary: #8B5CF6;
+      --brand-secondary: #6D28D9;
+      --brand-light: #7C3AED;
+      --brand-dark: #6D28D9;
+      --dark-bg: #111827; /* Slightly lighter than pure black for depth */
+      --dark-card: #1f2937;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --error-color: #e74c3c;
+    }
+
+    /* ===== RESET & BASE ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f7fc;
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+    
+    body.dark {
+      background-color: var(--dark-bg);
+      color: #f3f4f6;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+    }
+    
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', serif;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ===== GLOBAL TOGGLES (Outside card, top corner) ===== */
+    .global-toggles {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 999;
+    }
+    [dir="rtl"] .global-toggles {
+      right: auto;
+      left: 24px;
+    }
+    .global-toggles button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .dark .global-toggles button {
+      background: var(--dark-card);
+      border-color: #374151;
+      color: #f3f4f6;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .global-toggles button:hover {
+      background: var(--brand-primary);
+      color: #fff;
+      border-color: var(--brand-primary);
+      transform: translateY(-2px);
+    }
+    .global-toggles .rtl-btn {
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+    }
+
+    /* ===== SIGNIN CARD ===== */
+    .signin-card {
+      max-width: 460px;
+      width: 100%;
+      background: #fff;
+      border-radius: 32px;
+      padding: 40px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+      border: 1px solid #f0edf5;
+      text-align: center;
+      position: relative;
+      transition: background 0.3s, border-color 0.3s;
+      z-index: 10;
+    }
+    .dark .signin-card {
+      background: var(--dark-card);
+      border-color: #374151;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    /* ===== RTL CARD STYLES ===== */
+    [dir="rtl"] .signin-card,
+    [dir="rtl"] .form-group,
+    [dir="rtl"] .error-message {
+      text-align: right;
+    }
+    [dir="rtl"] .input-wrap input {
+      text-align: right;
+    }
+    [dir="rtl"] .error-message {
+      border-left: none;
+      border-right: 4px solid var(--error-color);
+    }
+
+    /* ===== LOGO ===== */
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--brand-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px; 
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+    .logo i {
+      color: var(--brand-secondary);
+    }
+    [dir="rtl"] .logo {
+      flex-direction: row; 
+    }
+
+    .signin-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+    
+    .signin-card .sub {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    /* ===== ERROR MESSAGE ===== */
+    .error-message {
+      background: rgba(231, 76, 60, 0.12);
+      border-left: 4px solid var(--error-color);
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: var(--error-color);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    .error-message.show {
+      display: flex;
+    }
+
+    /* ===== FORM FIELDS ===== */
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .input-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .input-label i {
+      color: var(--brand-primary);
+      margin-right: 8px;
+      width: 16px;
+      text-align: center;
+    }
+    [dir="rtl"] .input-label i {
+      margin-right: 0;
+      margin-left: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .input-field {
+      width: 100%;
+      height: 50px;
+      padding: 0 40px 0 20px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      border: 2px solid #f0edf5;
+      border-radius: 60px;
+      background: #fff;
+      color: #111827;
+      transition: 0.3s;
+      outline: none;
+    }
+    .dark .input-field {
+      background: #374151;
+      border-color: #4b5563;
+      color: #f3f4f6;
+    }
+    .input-field:focus {
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+    [dir="rtl"] .input-field {
+      padding: 12px 16px 12px 40px;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+    .password-toggle:hover {
+      color: var(--brand-primary);
+    }
+    [dir="rtl"] .password-toggle {
+      right: auto;
+      left: 16px;
+    }
+
+    /* ===== OPTIONS ROW ===== */
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0 24px;
+      font-size: 0.85rem;
+    }
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      accent-color: var(--brand-primary);
+      width: 16px;
+      height: 16px;
+    }
+    .forgot-link {
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* ===== BUTTONS ===== */
+    .signin-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-dark));
+      border: none;
+      border-radius: 60px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 24px rgba(139,92,246,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .signin-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px rgba(139,92,246,0.45);
+    }
+
+    .signin-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+    .signin-divider hr {
+      flex: 1;
+      border: none;
+      border-top: 1px solid #e5e7eb;
+    }
+    .dark .signin-divider hr { border-top-color: #4b5563; }
+
+    /* ===== CIRCULAR SOCIAL LOGIN ICONS ===== */
+    .social-login {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .social-login a {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f3f1f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      font-size: 1.1rem;
+      transition: 0.3s;
+      border: 1px solid #e5e7eb;
+    }
+    .dark .social-login a {
+      background: #374151;
+      color: #f3f4f6;
+      border-color: #4b5563;
+    }
+    .social-login a:hover {
+      background: var(--brand-primary);
+      color: #fff;
+      transform: translateY(-3px);
+      border-color: var(--brand-primary);
+    }
+    .social-login a img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    /* Social icons colors */
+    .fa-google { color: #EA4335; }
+    .fa-facebook-f { color: #1877F2; }
+    .fa-apple { color: #000000; }
+    body.dark .fa-apple { color: #ffffff; }
+
+    .register-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .register-link a {
+      color: var(--brand-primary);
+      font-weight: 700;
+    }
+    .register-link a:hover { text-decoration: underline; }
+
+    /* =========================================================
+       RESPONSIVE ADJUSTMENTS: TARGETING 360x740 & SMALL MOBILES
+       ========================================================= */
+    @media (max-width: 400px), (max-height: 750px) {
+      body {
+        padding: 16px;
+        align-items: flex-start; /* Prevents top cut-off if height is extremely tight */
+      }
+      
+      /* Scale and adjust toggles so they fit nicely at the very top */
+      .global-toggles {
+        top: 16px;
+        right: 16px;
+        gap: 8px;
+      }
+      [dir="rtl"] .global-toggles {
+        left: 16px;
+        right: auto;
+      }
+      .global-toggles button {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+      }
+
+      /* Adjust card to clear the top toggles and fit 360 width perfectly */
+      .signin-card {
+        padding: 32px 20px;
+        margin-top: 60px; /* Pushes card down so it doesn't collide with the fixed toggles */
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+      }
+      
+      .signin-card h2 {
+        font-size: 1.5rem;
+      }
+      
+      .signin-card .sub {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+      }
+      
+      /* Make inputs slightly tighter */
+      .input-field {
+        padding: 10px 36px 10px 14px;
+        font-size: 0.9rem;
+      }
+      [dir="rtl"] .input-field {
+        padding: 10px 14px 10px 36px;
+      }
+      
+      /* Adjust form options text sizes for 360px bounds */
+      .form-options {
+        font-size: 0.75rem;
+      }
+      
+      .social-login a {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== GLOBAL TOGGLES: Outside the card ===== -->
+<div class="global-toggles">
+  <button id="themeToggle" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+  <button id="rtlToggle" class="rtl-btn" aria-label="Toggle RTL"><span id="rtlBtnText">RTL</span></button>
+</div>
+
+<!-- ===== SIGN IN CARD ===== -->
+<div class="signin-card">
+
+  <!-- ===== LOGO ===== -->
+  <a href="index.html" class="logo"><i class="fas fa-camera"></i> LensPro</a>
+
+  <h2>Welcome Back!</h2>
+  <p class="sub">Sign in to access your gallery &amp; bookings</p>
+
+  <!-- Error Message Container -->
+  <div id="loginError" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i> <span id="errorText">Invalid email or password</span>
+  </div>
+
+  <form id="loginForm">
+    <!-- Email Field -->
+    <div class="form-group">
+      <label class="input-label"><i class="fas fa-envelope"></i> Email Address</label>
+      <div class="input-wrap">
+        <input type="email" id="emailInput" class="input-field" placeholder="hello@lenspro.com" required autocomplete="email">
+      </div>
+    </div>
+
+    <!-- Password Field with Toggle -->
+    <div class="form-group">
+      <label class="input-label"><i class="fas fa-lock"></i> Password</label>
+      <div class="input-wrap">
+        <input type="password" id="passwordInput" class="input-field" placeholder="••••••••" required autocomplete="current-password">
+        <button type="button" class="password-toggle" id="togglePassword" aria-label="Show password">
+          <i class="far fa-eye-slash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Options Row -->
+    <div class="form-options">
+      <label class="checkbox-wrap">
+        <input type="checkbox" id="rememberMe" checked> <span>Remember me</span>
+      </label>
+      <a href="#" class="forgot-link" id="forgotPassword">Forgot password?</a>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="signin-btn" id="loginBtn">
+      Sign In
+    </button>
+  </form>
+
+  <!-- Social Login Section -->
+  <div class="signin-divider">
+    <hr> <span>or continue with</span> <hr>
+  </div>
+
+  <div class="social-login">
+    <a href="#" aria-label="Google"><img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width="20" height="20"></a>
+    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" aria-label="Apple"><i class="fab fa-apple"></i></a>
+  </div>
+
+  <div class="register-link">
+    <span dir="auto">Don't have an account?</span> 
+    <a href="signup.html" id="registerLink">Create Account</a>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // ----- FORM & UI ELEMENTS -----
+  const form = document.getElementById('loginForm');
+  const emailInput = document.getElementById('emailInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const errorDiv = document.getElementById('loginError');
+  const errorTextSpan = document.getElementById('errorText');
+  const loginBtn = document.getElementById('loginBtn');
+
+  // ----- THEME TOGGLE -----
+  const toggleTheme = () => {
+    document.body.classList.toggle('dark');
+    const icon = document.querySelector('#themeToggle i');
+    if (document.body.classList.contains('dark')) {
+      icon.className = 'fas fa-sun';
+    } else {
+      icon.className = 'fas fa-moon';
+    }
+  };
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  // ----- RTL TOGGLE -----
+  const rtlBtnTextSpan = document.getElementById('rtlBtnText');
+  const toggleRTL = () => {
+    const html = document.documentElement;
+    const currentDir = html.getAttribute('dir');
+    const newDir = currentDir === 'rtl' ? 'ltr' : 'rtl';
+    html.setAttribute('dir', newDir);
+    
+    if (newDir === 'rtl') {
+      rtlBtnTextSpan.innerText = 'LTR';
+    } else {
+      rtlBtnTextSpan.innerText = 'RTL';
+    }
+  };
+  document.getElementById('rtlToggle').addEventListener('click', toggleRTL);
+
+  // ----- PASSWORD TOGGLE LOGIC -----
+  let passwordVisible = false;
+  togglePasswordBtn.addEventListener('click', () => {
+    passwordVisible = !passwordVisible;
+    passwordInput.type = passwordVisible ? 'text' : 'password';
+    togglePasswordBtn.innerHTML = passwordVisible ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+  });
+
+  // ----- ERROR DISPLAY LOGIC -----
+  function showError(message) {
+    errorTextSpan.innerText = message;
+    errorDiv.classList.add('show');
+    setTimeout(() => {
+      errorDiv.classList.remove('show');
+    }, 3500);
+  }
+
+  // ----- SIGNIN FORM SUBMISSION -----
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    if (!email) { 
+        showError('Please enter your email address'); 
+        return; 
+    }
+    if (!password) { 
+        showError('Please enter your password'); 
+        return; 
+    }
+
+    // Mock Login State
+    const originalHTML = loginBtn.innerHTML;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Signing In...';
+    loginBtn.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+      loginBtn.innerHTML = originalHTML;
+      loginBtn.style.pointerEvents = 'auto';
+      alert('Signed in successfully (demo). Welcome back to LensPro!');
+    }, 1000);
+  });
+</script>
+
+</body>
+</html>
